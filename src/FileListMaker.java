@@ -30,6 +30,7 @@ public class FileListMaker {
         String menuChoice; // stores user's choice; used for both menus
 
         do {
+
             // uses a method inside the Print class to print the main menu to console and get input
             menuChoice = Print.printMainMenu();
             /* preview:
@@ -132,7 +133,8 @@ public class FileListMaker {
                 case "s" -> {
                     // if they chose to save, calls the save method
                     try {
-                        dirty = save(path, list);
+                        save(path, list);
+                        dirty = false; // list is now clean
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -217,18 +219,25 @@ public class FileListMaker {
      *
      * @param path location and name of the new file
      * @param list ArrayList to be saved
-     * @return a false dirty flag
      * @throws IOException If an output exception occurs
      */
-    private static boolean save(Path path, ArrayList<String> list) throws IOException {
+    private static void save(Path path, ArrayList<String> list) throws IOException {
 
-        // if the file exists, deletes the old file
-        if (path.toFile().exists()) {
-            Files.delete(path);
+        try {
+            // if the file exists, deletes the old file
+            if (path.toFile().exists()) {
+                Files.delete(path);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // (re)creates a file at that path
-        Files.createFile(path);
+        try {
+            // (re)creates a file at that path
+            Files.createFile(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // instantiates output stream and writer
         OutputStream out = new BufferedOutputStream(Files.newOutputStream(path, CREATE));
@@ -240,8 +249,5 @@ public class FileListMaker {
             writer.newLine();
         }
         writer.close(); // close the writer
-
-        // the boolean returned by this method is for the dirty flag; if it successfully saved, it returns false
-        return false;
     }
 }
